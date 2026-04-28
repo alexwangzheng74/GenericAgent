@@ -37,15 +37,17 @@ if agent is None:
     st.markdown("""
 ### 在 Streamlit Cloud 上配置
     
-1. 点击右上角 **⚙️ Settings** → **Secrets**
-2. 粘贴以下内容并保存：
+1. 打开本地的 `~/GenericAgent/streamlit_secret.json` 文件，复制全部内容
+2. 点击右上角 **⚙️ Settings** → **Secrets**
+3. 粘贴为以下格式并保存：
 
 ```toml
-MYKEY_CONFIG = '{"native_oai_config":{"name":"gpt-native","apikey":"sk-YOUR-KEY","apibase":"https://turixapi.io/v1","model":"turix-brain","api_mode":"chat_completions","max_retries":3,"connect_timeout":10,"read_timeout":120},"mixin_config":{"llm_nos":["gpt-native"],"max_retries":10,"base_delay":0.5}}'
+MYKEY_CONFIG = """
+粘贴 streamlit_secret.json 的内容到这里
+"""
 ```
 
-3. 将 `sk-YOUR-KEY` 替换为你的 TuriX API Key
-4. App 会自动重启并连接
+4. 保存后 App 自动重启并连接
 """)
     st.stop()
 
