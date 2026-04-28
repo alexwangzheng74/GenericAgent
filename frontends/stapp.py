@@ -34,21 +34,19 @@ st.title("🖥️ Cowork")
 
 if agent is None:
     st.warning("⚠️ 未配置 LLM 接口")
-    st.markdown("""
+    st.markdown('''
 ### 在 Streamlit Cloud 上配置
-    
-1. 打开本地的 `~/GenericAgent/streamlit_secret.json` 文件，复制全部内容
-2. 点击右上角 **⚙️ Settings** → **Secrets**
-3. 粘贴为以下格式并保存：
 
-```toml
-MYKEY_CONFIG = """
-粘贴 streamlit_secret.json 的内容到这里
-"""
+1. 打开本地的 `~/GenericAgent/streamlit_secret.json` 文件，复制全部内容
+2. 点击右上角 **Settings** → **Secrets**
+3. 按以下格式粘贴（用三个双引号包裹 JSON）：
+
+```
+MYKEY_CONFIG = """<粘贴 streamlit_secret.json 内容>"""
 ```
 
 4. 保存后 App 自动重启并连接
-""")
+''')
     st.stop()
 
 st.session_state.setdefault('autonomous_enabled', False)
