@@ -10,8 +10,14 @@ def _load_mykeys():
         return {k: v for k, v in vars(mykey).items() if not k.startswith('_')}
     except ImportError: pass
     _mykey_path = p = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mykey.json')
-    if not os.path.exists(p): raise Exception('[ERROR] mykey.py or mykey.json not found, please create one from mykey_template.')
-    with open(p, encoding='utf-8') as f: return json.load(f)
+    if os.path.exists(p):
+        with open(p, encoding='utf-8') as f: return json.load(f)
+    # Fallback: load from MYKEY_CONFIG env var (Streamlit Cloud secrets compatible)
+    env_config = os.environ.get('MYKEY_CONFIG')
+    if env_config:
+        _mykey_path = '<env:MYKEY_CONFIG>'
+        return json.loads(env_config)
+    raise Exception('[ERROR] mykey.py or mykey.json not found, please create one from mykey_template.')
 
 _mykey_path = _mykey_mtime = None
 def reload_mykeys():
