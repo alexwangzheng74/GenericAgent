@@ -29,7 +29,9 @@ def _load_mykeys():
         print(f'[DEBUG] st.secrets raw: {dict(_st.secrets)}')
     except Exception as e:
         print(f'[DEBUG] st.secrets error: {type(e).__name__}: {e}')
-    raise Exception('[ERROR] mykey.py or mykey.json not found, and MYKEY_CONFIG not set in env or Streamlit secrets.')
+    print('[WARN] No mykey source found — running with empty config (app will show setup UI)')
+    _mykey_path = '<none>'
+    return {}
 
 _mykey_path = _mykey_mtime = None
 def reload_mykeys():
