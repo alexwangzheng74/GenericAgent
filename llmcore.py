@@ -24,8 +24,11 @@ def _load_mykeys():
         if secret_val:
             _mykey_path = '<st.secrets:MYKEY_CONFIG>'
             return json.loads(secret_val) if isinstance(secret_val, str) else secret_val
-    except Exception:
-        pass
+        # Debug: show available secrets keys
+        print(f'[DEBUG] st.secrets keys: {list(_st.secrets.keys())}')
+        print(f'[DEBUG] st.secrets raw: {dict(_st.secrets)}')
+    except Exception as e:
+        print(f'[DEBUG] st.secrets error: {type(e).__name__}: {e}')
     raise Exception('[ERROR] mykey.py or mykey.json not found, and MYKEY_CONFIG not set in env or Streamlit secrets.')
 
 _mykey_path = _mykey_mtime = None
