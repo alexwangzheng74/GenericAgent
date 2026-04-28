@@ -23,14 +23,31 @@ st.set_page_config(page_title="Cowork", layout="wide")
 def init():
     agent = GeneraticAgent()
     if agent.llmclient is None:
-        st.error("⚠️ 未配置任何可用的 LLM 接口，请设置mykey.py。")
-        st.stop()
-    else: threading.Thread(target=agent.run, daemon=True).start()
+        return None  # no config yet — UI will show setup page
+    else:
+        threading.Thread(target=agent.run, daemon=True).start()
     return agent
 
 agent = init()
 
 st.title("🖥️ Cowork")
+
+if agent is None:
+    st.warning("⚠️ 未配置 LLM 接口")
+    st.markdown("""
+### 在 Streamlit Cloud 上配置
+    
+1. 点击右上角 **⚙️ Settings** → **Secrets**
+2. 粘贴以下内容并保存：
+
+```toml
+MYKEY_CONFIG = '{"native_oai_config":{"name":"gpt-native","apikey":"sk-YOUR-KEY","apibase":"https://turixapi.io/v1","model":"turix-brain","api_mode":"chat_completions","max_retries":3,"connect_timeout":10,"read_timeout":120},"mixin_config":{"llm_nos":["gpt-native"],"max_retries":10,"base_delay":0.5}}'
+```
+
+3. 将 `sk-YOUR-KEY` 替换为你的 TuriX API Key
+4. App 会自动重启并连接
+""")
+    st.stop()
 
 st.session_state.setdefault('autonomous_enabled', False)
 
