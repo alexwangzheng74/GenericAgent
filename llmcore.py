@@ -12,19 +12,36 @@ def _load_mykeys():
     _mykey_path = p = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mykey.json')
     if os.path.exists(p):
         with open(p, encoding='utf-8') as f: return json.load(f)
-    # Fallback: load from MYKEY_CONFIG env var (Streamlit Cloud secrets compatible)
+    # Fallback: load from MYKEY_CONFIG env var
     env_config = os.environ.get('MYKEY_CONFIG')
     if env_config:
         _mykey_path = '<env:MYKEY_CONFIG>'
         return json.loads(env_config)
-    raise Exception('[ERROR] mykey.py or mykey.json not found, please create one from mykey_template.')
+    # Fallback: load from Streamlit Cloud secrets (st.secrets)
+    try:
+        import streamlit as _st
+        secret_val = _st.secrets.get('MYKEY_CONFIG')
+        if secret_val:
+            _mykey_path = '<st.secrets:MYKEY_CONFIG>'
+            return json.loads(secret_val) if isinstance(secret_val, str) else secret_val
+    except Exception:
+        pass
+    raise Exception('[ERROR] mykey.py or mykey.json not found, and MYKEY_CONFIG not set in env or Streamlit secrets.')
 
 _mykey_path = _mykey_mtime = None
 def reload_mykeys():
     global _mykey_mtime
-    mt = os.stat(_mykey_path).st_mtime_ns if _mykey_path else -1
+    # Use time-based mtime for non-filesystem sources (env, secrets)
+    if _mykey_path and _mykey_path.startswith('<'):
+        mt = int(time.time() * 1e9)  # force reload
+    else:
+        mt = os.stat(_mykey_path).st_mtime_ns if _mykey_path else -1
     if mt == _mykey_mtime: return globals().get('mykeys', {}), False
-    mk = _load_mykeys(); _mykey_mtime = os.stat(_mykey_path).st_mtime_ns
+    mk = _load_mykeys()
+    if _mykey_path and _mykey_path.startswith('<'):
+        _mykey_mtime = int(time.time() * 1e9)
+    else:
+        _mykey_mtime = os.stat(_mykey_path).st_mtime_ns
     print(f'[Info] Load mykeys from {_mykey_path}')
     globals().update(mykeys=mk)
     if mk.get('langfuse_config'):
